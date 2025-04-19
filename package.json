@@ -1,0 +1,33 @@
+{
+  "name": "fingrip-whatsapp-bot",
+  "version": "1.0.0",
+  "description": "A WhatsApp bot for personal finance tracking and analysis",
+  "main": "src/app.js",
+  "scripts": {
+    "start": "node src/app.js",
+    "dev": "nodemon src/app.js"
+  },
+  "author": "samaresh",
+  "license": "ISC",
+  "dependencies": {
+    "@google/genai": "^0.9.0",
+    "axios": "^1.6.7",
+    "body-parser": "^2.2.0",
+    "dotenv": "^16.5.0",
+    "express": "^4.18.2",
+    "fs": "^0.0.1-security",
+    "mongoose": "^8.13.2",
+    "multer": "^1.4.5-lts.2",
+    "node-cron": "^3.0.3",
+    "ocr-space-api-wrapper": "^2.3.0",
+    "puppeteer": "^24.6.1",
+    "qrcode-terminal": "^0.12.0",
+    "sharp": "^0.33.2",
+    "tesseract.js": "^6.0.1",
+    "whatsapp-web.js": "^1.23.0",
+    "words-to-numbers": "^1.5.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.3"
+  }
+}
