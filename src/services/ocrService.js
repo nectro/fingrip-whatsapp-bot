@@ -1,13 +1,22 @@
-const { ocrSpace } = require('ocr-space-api-wrapper');
+const vision = require('@google-cloud/vision');
 const sharp = require('sharp');
 const fs = require('fs');
 const path = require('path');
-const { OCR_API_KEY } = require('../config/config');
+const { GOOGLE_CLOUD_VISION_CREDENTIALS } = require('../config/config');
+
+// Initialize Google Cloud Vision client with credentials
+const client = new vision.ImageAnnotatorClient({
+    credentials: GOOGLE_CLOUD_VISION_CREDENTIALS,
+    projectId: GOOGLE_CLOUD_VISION_CREDENTIALS.project_id
+});
 
 async function processImage(mediaData) {
+    let filePath = null;
+    let processedPath = null;
+
     try {
-        const filePath = path.join(__dirname, '../../temp/temp_image.jpg');
-        const processedPath = path.join(__dirname, '../../temp/processed_image.jpg');
+        filePath = path.join(__dirname, '../../temp/temp_image.jpg');
+        processedPath = path.join(__dirname, '../../temp/processed_image.jpg');
 
         // Ensure temp directory exists
         if (!fs.existsSync(path.join(__dirname, '../../temp'))) {
@@ -24,35 +33,87 @@ async function processImage(mediaData) {
             .normalize()
             .toFile(processedPath);
 
-        // Perform OCR
-        const result = await ocrSpace(processedPath, {
-            apiKey: OCR_API_KEY,
-            language: 'eng',
-            isOverlayRequired: false,
-        });
+        // Perform OCR using Google Cloud Vision
+        const [result] = await client.textDetection(processedPath);
 
-        // Clean up temporary files
-        fs.unlinkSync(filePath);
-        fs.unlinkSync(processedPath);
+        if (!result || !result.textAnnotations) {
+            throw new Error('Invalid response from Google Cloud Vision API');
+        }
 
-        const extractedText = result.ParsedResults?.[0]?.ParsedText || '';
+        const detections = result.textAnnotations;
+        
+        if (!detections || detections.length === 0) {
+            return {
+                success: false,
+                error: 'No text detected in image'
+            };
+        }
 
-        console.log(extractedText, "extractedText");
+        console.log('Detections:', detections);
 
-        const amountMatch = extractedText.match(/[₹RsINR*?]{0,3}\s?[\d]{1,3}(?:[,.\d]{0,10})/i);
+        const extractedText = detections[0].description;
+        console.log('Extracted Text:', extractedText);
+
+        let currencyPatterns = [];
+
+        // Extract amount using regex patterns
+        if (extractedText.toLowerCase().includes('cred')) {
+            currencyPatterns = [
+                /(\d{1,3}(?:,\d{3})*(?:\.\d{2})?)\n/
+            ];
+        } else {
+            // This pattern matches various Indian currency formats:
+            // ₹1,234.56 or Rs. 1,234.56 or INR 1,234.56 or just 1,234.56
+            currencyPatterns = [
+                /(?:₹|Rs\.?|INR)\s*(\d{1,3}(?:,\d{3})*(?:\.\d{2})?)/i,  // Matches ₹1,234.56, Rs. 1,234.56
+                /(\d{1,3}(?:,\d{3})*(?:\.\d{2})?)\s*(?:₹|Rs\.?|INR)/i,  // Matches 1,234.56 Rs
+                /(\d{1,3}(?:,\d{3})*(?:\.\d{2})?)/,                       // Matches plain numbers as fallback
+            ];
+        }
+
+        let amount = null;
+        for (const pattern of currencyPatterns) {
+            const match = extractedText.match(pattern);
+            if (match) {
+                amount = match[1] || match[0];
+                break;
+            }
+        }
+
+        // Clean up the amount
+        if (amount) {
+            amount = amount.replace(/[^\d.,]/g, ''); // Remove all non-numeric characters except . and ,
+        }
 
         return {
             success: true,
-            amount: amountMatch ? amountMatch[0].replace("*", "") : null,
-            rawText: extractedText
+            amount: amount,
+            rawText: extractedText,
+            confidence: result.textAnnotations[0].confidence || null
         };
 
     } catch (error) {
         console.error('OCR Processing Error:', error);
         return {
             success: false,
-            error: error.message
+            error: error.message,
+            errorDetails: {
+                code: error.code,
+                details: error.details
+            }
         };
+    } finally {
+        // Clean up temporary files
+        try {
+            if (filePath && fs.existsSync(filePath)) {
+                fs.unlinkSync(filePath);
+            }
+            if (processedPath && fs.existsSync(processedPath)) {
+                fs.unlinkSync(processedPath);
+            }
+        } catch (cleanupError) {
+            console.error('Error cleaning up temporary files:', cleanupError);
+        }
     }
 }
 
