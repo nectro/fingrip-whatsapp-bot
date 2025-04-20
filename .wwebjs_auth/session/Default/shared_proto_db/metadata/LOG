@@ -1,2 +1,3 @@
-2025/04/19-09:11:08.188 6b07 Creating DB /Users/sam/Desktop/Project Exec/first Iteration/.wwebjs_auth/session/Default/shared_proto_db/metadata since it was missing.
-2025/04/19-09:11:08.261 6b07 Reusing MANIFEST /Users/sam/Desktop/Project Exec/first Iteration/.wwebjs_auth/session/Default/shared_proto_db/metadata/MANIFEST-000001
+2025/04/20-14:47:11.836 14b17 Reusing MANIFEST /Users/sam/Desktop/Project Exec/first Iteration/.wwebjs_auth/session/Default/shared_proto_db/metadata/MANIFEST-000001
+2025/04/20-14:47:11.837 14b17 Recovering log #3
+2025/04/20-14:47:11.837 14b17 Reusing old log /Users/sam/Desktop/Project Exec/first Iteration/.wwebjs_auth/session/Default/shared_proto_db/metadata/000003.log 

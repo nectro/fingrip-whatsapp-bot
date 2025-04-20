@@ -1,3 +1,4 @@
-2025/04/19-19:51:22.005 10003 Reusing MANIFEST /Users/sam/Desktop/Project Exec/first Iteration/.wwebjs_auth/session/Default/Session Storage/MANIFEST-000001
-2025/04/19-19:51:22.005 10003 Recovering log #3
-2025/04/19-19:51:22.005 10003 Reusing old log /Users/sam/Desktop/Project Exec/first Iteration/.wwebjs_auth/session/Default/Session Storage/000003.log 
+2025/04/20-15:07:17.010 14903 Reusing MANIFEST /Users/sam/Desktop/Project Exec/first Iteration/.wwebjs_auth/session/Default/Session Storage/MANIFEST-000001
+2025/04/20-15:07:17.010 14903 Recovering log #3
+2025/04/20-15:07:17.011 14903 (ignoring error) /Users/sam/Desktop/Project Exec/first Iteration/.wwebjs_auth/session/Default/Session Storage/000003.log: dropping 7027 bytes; Corruption: checksum mismatch
+2025/04/20-15:07:17.011 14903 Reusing old log /Users/sam/Desktop/Project Exec/first Iteration/.wwebjs_auth/session/Default/Session Storage/000003.log 
