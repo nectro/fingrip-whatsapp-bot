@@ -7,3 +7,5 @@ package-lock.json
 .wwebjs_cache
 
 google_creds.json
+
+src/config/config.js
